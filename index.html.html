@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindScribe - AI Content Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0f1419;
+            --text-dark: #f0f0f0;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --border-dark: #374151;
+            --card-dark: #1f2937;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-dark);
+            backdrop-filter: blur(10px);
+            background: rgba(15, 20, 25, 0.7);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-dark);
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 24px rgba(59, 130, 246, 0.15);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            opacity: 0.7;
+        }
+
+        .generator {
+            max-width: 900px;
+            margin: 3rem auto;
+            padding: 2rem;
+            background: var(--card-dark);
+            border-radius: 12px;
+            border: 1px solid var(--border-dark);
+        }
+
+        .generator h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .input-group textarea,
+        .input-group input,
+        .input-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border-dark);
+            border-radius: 8px;
+            background: var(--bg-dark);
+            color: var(--text-dark);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .input-group textarea:focus,
+        .input-group input:focus,
+        .input-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 1px solid var(--border-dark);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--card-dark);
+            border-color: var(--primary);
+        }
+
+        .output {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-dark);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            display: none;
+        }
+
+        .output.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .output h3 {
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--primary);
+        }
+
+        .output p {
+            line-height: 1.8;
+            font-size: 0.95rem;
+        }
+
+        .copy-btn {
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .pricing {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            padding: 3rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--card-dark);
+            border: 1px solid var(--border-dark);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .pricing-card.featured {
+            border: 2px solid var(--primary);
+            transform: scale(1.05);
+        }
+
+        .badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .pricing-card h3 {
+            font-size: 1.3rem;
+            margin: 1rem 0;
+        }
+
+        .price {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 1rem 0;
+        }
+
+        .price span {
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        .features-list {
+            text-align: left;
+            margin: 1.5rem 0;
+            font-size: 0.9rem;
+        }
+
+        .features-list li {
+            list-style: none;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .features-list li:before {
+            content: "✓ ";
+            color: var(--primary);
+            font-weight: 700;
+            margin-right: 0.5rem;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid var(--border-dark);
+            color: var(--text-dark);
+            opacity: 0.6;
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .pricing-card.featured {
+                transform: scale(1);
+            }
+
+            header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">✨ MindScribe</div>
+        <div style="color: #8b5cf6; font-weight: 600; font-size: 0.9rem;">AI Content Generator</div>
+    </header>
+
+    <section class="hero">
+        <h1>Create Content in Seconds</h1>
+        <p>Harness the power of AI to generate high-quality marketing copy, blog posts, and social media content instantly</p>
+        <button class="cta-button" id="scrollGenerator">Start Generating</button>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <h3>Blog Posts</h3>
+            <p>Generate engaging blog articles optimized for SEO and audience engagement</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <h3>Social Media</h3>
+            <p>Create viral-worthy content tailored for Instagram, Twitter, LinkedIn, and more</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">✉️</div>
+            <h3>Email Campaigns</h3>
+            <p>Write compelling email copy that converts readers into customers</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">📢</div>
+            <h3>Ad Copy</h3>
+            <p>Generate persuasive advertising copy for all platforms and campaigns</p>
+        </div>
+    </section>
+
+    <section class="generator">
+        <h2>Try Now: Blog Post Generator</h2>
+        <div class="input-group">
+            <label for="topic">Blog Topic</label>
+            <input type="text" id="topic" placeholder="e.g., How to increase productivity in 2025" value="How to increase productivity in 2025">
+        </div>
+        <div class="input-group">
+            <label for="audience">Target Audience</label>
+            <select id="audience">
+                <option>Professionals</option>
+                <option>Students</option>
+                <option>Entrepreneurs</option>
+                <option>Homeowners</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label for="tone">Tone</label>
+            <select id="tone">
+                <option>Professional</option>
+                <option>Casual</option>
+                <option>Inspirational</option>
+                <option>Humorous</option>
+            </select>
+        </div>
+        <div class="button-group">
+            <button class="btn btn-primary" id="generateBtn">Generate Content</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+        <div class="output" id="output">
+            <h3>Generated Blog Post</h3>
+            <p id="outputText"></p>
+            <button class="copy-btn" id="copyBtn">Copy to Clipboard</button>
+        </div>
+    </section>
+
+    <section class="pricing">
+        <div class="pricing-card">
+            <h3>Starter</h3>
+            <div class="price">Free<span>/month</span></div>
+            <ul class="features-list">
+                <li>50 generations/month</li>
+                <li>Basic templates</li>
+                <li>Single language</li>
+                <li>Community support</li>
+            </ul>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">Get Started</button>
+        </div>
+        <div class="pricing-card featured">
+            <div class="badge">Most Popular</div>
+            <h3>Professional</h3>
+            <div class="price">$29<span>/month</span></div>
+            <ul class="features-list">
+                <li>Unlimited generations</li>
+                <li>All templates</li>
+                <li>40+ languages</li>
+                <li>Priority support</li>
+                <li>AI customization</li>
+            </ul>
+            <button class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Start Trial</button>
+        </div>
+        <div class="pricing-card">
+            <h3>Enterprise</h3>
+            <div class="price">Custom</div>
+            <ul class="features-list">
+                <li>Everything in Pro</li>
+                <li>Custom integrations</li>
+                <li>Dedicated support</li>
+                <li>White-label options</li>
+                <li>API access</li>
+            </ul>
+            <button class="btn btn-secondary" style="width: 100%; margin-top: 1rem;">Contact Sales</button>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2025 MindScribe. Created with AI for creators. All rights reserved.</p>
+    </footer>
+
+    <script>
+        const generateBtn = document.getElementById('generateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const output = document.getElementById('output');
+        const outputText = document.getElementById('outputText');
+        const copyBtn = document.getElementById('copyBtn');
+        const scrollBtn = document.getElementById('scrollGenerator');
+
+        const sampleOutputs = [
+            "# Unlocking Productivity: 10 Proven Strategies for 2025\n\nIn today's fast-paced world, productivity isn't just about working harder—it's about working smarter. Whether you're a busy professional juggling multiple projects or an entrepreneur building your empire, these actionable strategies will transform how you work.\n\n## 1. Master Your Morning Routine\nStart your day with intention. The first hour sets the tone for everything that follows. Spend time on high-impact activities before checking emails.\n\n## 2. The Power of Time Blocking\nDivide your day into focused blocks of time dedicated to specific tasks. This eliminates context switching and keeps you in flow state.\n\n## 3. Leverage Technology Wisely\nUse automation tools to handle repetitive tasks. Focus your energy on what only you can do.\n\n## 4. Build Better Habits\nSmall consistent actions compound over time. Start with one habit and build from there.\n\n## 5. Protect Your Energy\nNot all hours are equal. Identify your peak productivity hours and guard them fiercely for deep work.\n\nProductivity isn't about doing everything—it's about doing the right things at the right time.",
+            "# Maximizing Your Time: A Modern Guide to Getting More Done\n\nFeeling overwhelmed? You're not alone. With endless notifications and competing demands, staying productive requires intentional strategies.\n\n## The Productivity Paradox\nWorking longer doesn't mean working better. In fact, research shows that focused work in shorter bursts outperforms marathon sessions.\n\n## Key Principles for 2025\n- Batch similar tasks together\n- Create distraction-free zones\n- Regular breaks improve focus\n- Delegate what doesn't require your unique skills\n\n## Tools That Actually Help\nThe best tools are ones you'll actually use. Experiment with different systems until you find what clicks for you.\n\nRemember: productivity is a practice, not a destination. Start small, stay consistent, and watch the results compound.",
+            "# Stop Working Harder and Start Working Smarter\n\nThe secret to productivity isn't secrets at all—it's systems.\n\nYou already know what needs to be done. The challenge is actually doing it consistently. That's where smart systems come in.\n\n## Three Game-Changing Habits\n1. **Plan Backwards**: Start with your goals and work backwards to today\n2. **Protect Focus Time**: Treat deep work like important meetings\n3. **Review Regularly**: Weekly reviews keep you aligned and improve\n\nThe year ahead is full of possibility. With the right approach, you can accomplish more than you thought possible while working less and enjoying more."
+        ];
+
+        function generateContent() {
+            const topic = document.getElementById('topic').value;
+
+            if (!topic.trim()) {
+                alert('Please enter a blog topic');
+                return;
+            }
+
+            generateBtn.textContent = 'Generating...';
+            generateBtn.disabled = true;
+
+            setTimeout(() => {
+                const randomOutput = sampleOutputs[Math.floor(Math.random() * sampleOutputs.length)];
+                outputText.textContent = randomOutput;
+                output.classList.add('show');
+                generateBtn.textContent = 'Generate Content';
+                generateBtn.disabled = false;
+            }, 1500);
+        }
+
+        function resetForm() {
+            document.getElementById('topic').value = '';
+            document.getElementById('audience').value = 'Professionals';
+            document.getElementById('tone').value = 'Professional';
+            output.classList.remove('show');
+        }
+
+        function copyToClipboard() {
+            navigator.clipboard.writeText(outputText.textContent);
+            const oldText = copyBtn.textContent;
+            copyBtn.textContent = '✓ Copied!';
+            setTimeout(() => {
+                copyBtn.textContent = oldText;
+            }, 2000);
+        }
+
+        generateBtn.addEventListener('click', generateContent);
+        resetBtn.addEventListener('click', resetForm);
+        copyBtn.addEventListener('click', copyToClipboard);
+        scrollBtn.addEventListener('click', () => {
+            document.querySelector('.generator').scrollIntoView({ behavior: 'smooth' });
+        });
+    </script>
+</body>
+</html>
